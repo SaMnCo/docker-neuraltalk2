@@ -53,12 +53,19 @@ RUN cd /opt/neural-networks/ && \
 # Adding folders a local stuff 
 RUN mkdir -p /data/model /data/images 
 
-VOLUME /data
+VOLUME /data/model
+VOLUME /data/images
 
 # Expose default port
 expose 8000
 
 ADD install.sh /opt/neural-networks/install.sh
+ADD run.sh run.sh
+
+RUN chmod +x /opt/neural-networks/install.sh && \
+    chown root:root /opt/neural-networks/install.sh && \
+    chmod +x run.sh && \
+    chown root:root run.sh
 
 RUN chmod +x /opt/neural-networks/install.sh && \
     chown root:root /opt/neural-networks/install.sh 

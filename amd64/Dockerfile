@@ -63,9 +63,13 @@ VOLUME /data
 expose 8000
 
 ADD install.sh /opt/neural-networks/install.sh
+ADD run.sh run.sh
 
 RUN chmod +x /opt/neural-networks/install.sh && \
-    chown root:root /opt/neural-networks/install.sh 
+    chown root:root /opt/neural-networks/install.sh && \
+    chmod +x run.sh && \
+    chown root:root run.sh
+
 
 CMD [ "/opt/neural-networks/install.sh", "/data/model", "/data/images" ]
 

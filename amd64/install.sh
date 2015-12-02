@@ -1,8 +1,8 @@
 #!/bin/bash
 
 DATASET="${DATASET_SRC}"
-MODEL="$2"
-IMAGES="$3"
+MODEL="$1"
+IMAGES="$2"
 
 . ~/.bashrc
 
@@ -25,10 +25,14 @@ MODEL="$(find /data/model -name '*.t7')"
 
 # Copy 10 images for testing
 cd "${IMAGES}"
-for i in $(seq 1 1 10)
-do 
-	wget -qbc http://cs.stanford.edu/people/karpathy/neuraltalk2/imgs/img${i}.jpg
-done
+HAS_IMAGES=$(ls | wc -l)
+if [ ${HAS_IMAGES} -eq 0 ]
+then
+	for i in $(seq 1 1 10)
+	do 
+		wget -qbc http://cs.stanford.edu/people/karpathy/neuraltalk2/imgs/img${i}.jpg
+	done
+fi
 
 # Run command
 cd /opt/neural-networks/neuraltalk2
