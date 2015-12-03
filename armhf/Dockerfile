@@ -1,4 +1,4 @@
-FROM armv7/armhf-ubuntu:14/04
+FROM armv7/armhf-ubuntu:14.04
 
 MAINTAINER Samuel Cozannet <samuel.cozannet@madeden.com>
 

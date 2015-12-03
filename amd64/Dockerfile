@@ -49,7 +49,7 @@ RUN cd /opt/neural-networks/ && \
 
 # Downloading NeuralTalk
 RUN cd /opt/neural-networks/ && \
-    git clone https://github.com/karpathy/neuraltalk2
+    git clone https://github.com/SaMnCo/neuraltalk2
 
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
