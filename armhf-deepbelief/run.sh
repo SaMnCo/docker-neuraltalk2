@@ -12,6 +12,8 @@ then
 	echo "[]" > "${WEB_DIR}/${JSON_FILE}"
 fi
 
+[ ! -d "${WEB_DIR}/imgs" ] && mkdir -p "${WEB_DIR}/imgs"
+
 IMAGE="$1"
 cd "${ROOT_DIR}/source"
 RESULT=$(./jpcnn -i "${IMAGE}" -n "${ROOT_DIR}/networks/jetpac.ntwk" -m s | sort | tail -n1 | cut -f2-)
