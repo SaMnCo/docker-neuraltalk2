@@ -17,11 +17,11 @@ RUN cd /opt/neural-networks && \
     git clone https://github.com/torch/distro.git /opt/neural-networks/torch --recursive && \
     cd /opt/neural-networks/torch && \
     ./install.sh -b && \
-    . ~/.bashrc
+     ~/.bashrc
 
 # Install additional dependencies
 RUN cd /opt/neural-networks/torch && \
-    . ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     luarocks install nn && \
     luarocks install nngraph && \
     luarocks install image && \
@@ -29,7 +29,7 @@ RUN cd /opt/neural-networks/torch && \
 
 # Install HDF5 tools
 RUN cd /opt/neural-networks && \
-    . ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     git clone https://github.com/deepmind/torch-hdf5.git && \
     cd torch-hdf5 && \
     luarocks make hdf5-0-0.rockspec LIBHDF5_LIBDIR="/usr/lib/x86_64-linux-gnu/"
@@ -41,7 +41,7 @@ RUN pip install --upgrade cython && \
 
 # Install cjson
 RUN cd /opt/neural-networks/ && \
-    . ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     wget -c http://www.kyne.com.au/%7Emark/software/download/lua-cjson-2.1.0.tar.gz && \
     tar xfz lua-cjson-2.1.0.tar.gz && \
     cd lua-cjson-2.1.0 && \

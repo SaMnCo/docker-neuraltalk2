@@ -1,6 +1,22 @@
+# This images is meant to run on a ARMv7 device such as a Raspberry Pi
+# It provides a deep belief network to analyze the content of images. It is an implementation 
+# of the work shared by https://github.com/jetpacapp
+
+# When started, it will expose a web server on port 8000 that shares visualization of the images and their caption. Adding images is done by running the "run.sh" script with a path to an image.
+# The intended behavior is to store images in a shared volume (/data/images), then run a cron job or an incron job on all and/or new images to process them. They are then moved to a subfolder, while a thumbnail is generated for display in the website (you will need to refresh the page)
+
+# Usage :
+#   docker run -it -v <path/to/images>:/data/images -p 8000:8000 --name deepbelief samnco/armhf-deepbelief:latest
+# Then
+#   docker exec -it deepbelief run.sh /data/images/<image_name>
+# Access the visualization via http://localhost:8000
+
 FROM armv7/armhf-ubuntu:14.04
 
 MAINTAINER Samuel Cozannet <samuel.cozannet@madeden.com>
+
+ENV NETWORK ccv2012.ntwk
+# Possible values: jetpac.ntwk, ccv2012.ntwk, ccv2010.ntwk
 
 RUN apt-get update && \
     apt-get upgrade -yqq && \
@@ -23,7 +39,7 @@ RUN cd /opt/deep-belief && \
     cp src/include/libjpcnn.h /usr/include/
 
 # Adding folders a local stuff 
-RUN mkdir -p /data/images /data/www /data/output
+RUN mkdir -p /data/images/processed /data/www
 
 VOLUME /data/images
 
@@ -38,6 +54,5 @@ RUN chmod +x run.sh && \
     chown root:root run.sh && \
     chmod +x web.sh && \
     chown root:root web.sh
-
 
 CMD [ "web.sh" ]

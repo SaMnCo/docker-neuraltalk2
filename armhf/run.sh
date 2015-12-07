@@ -3,9 +3,9 @@
 MODEL="$1"
 IMAGES="/data/images"
 
-. ~/.bashrc
-
 MODEL="$(find /data/model -name '*.t7')"
+
+. /opt/neural-networks/torch/install/bin/torch-activate
 
 # Run command
 cd /opt/neural-networks/neuraltalk2

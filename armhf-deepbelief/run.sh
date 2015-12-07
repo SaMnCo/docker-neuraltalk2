@@ -13,8 +13,6 @@ WEB_DIR="/data/www"
 OUT_DIR="/data/output"
 JSON_FILE="vis.json"
 IMAGE="$1"
-NETWORK="ccv2012.ntwk"
-# NETWORK="jetpac.ntwk"
 
 if [ ! -f "${WEB_DIR}/${JSON_FILE}" ] 
 then
@@ -49,7 +47,8 @@ fi
 
 # Creating a mini version of the image for display
 convert "${IMAGE}" -resize 256x256 "${WEB_DIR}"/imgs/img_${NEXT}.jpg
-cp "${IMAGE}" "${OUT_DIR}/"
+# cp "${IMAGE}" "${OUT_DIR}/"
+rm "${IMAGE}"
 
 # Adding image to the visualization file
 cat "${WEB_DIR}/${JSON_FILE}" | jq ". + [ {\"caption\": \"${RESULT}\", \"image_id\": \"${NEXT}\", \"source_image\": \"${IMAGE}\", \"list_proba\": ${JSON_RESULT} }]" > /tmp/tmp.file && \

@@ -13,14 +13,22 @@ RUN apt-get update && \
 RUN cd /opt/neural-networks && \
     wget https://raw.githubusercontent.com/torch/ezinstall/master/install-deps && \
     chmod +x install-deps && \
-    ./install-deps && \    git clone https://github.com/torch/distro.git /opt/neural-networks/torch --recursive && \
+    ./install-deps
+
+RUN git clone https://github.com/torch/distro.git /opt/neural-networks/torch --recursive && \
     cd /opt/neural-networks/torch && \
     ./install.sh -b && \
-    . ~/.bashrc
+
+# Install addons to Torch
+RUN cd /opt/neural-networks && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
+    git clone https://github.com/mvitez/torch7.git mvittorch7 && \
+    cd mvittorch7 && \
+    luarocks make rocks/torch-scm-1.rockspec
 
 # Install additional dependencies
 RUN cd /opt/neural-networks/torch && \
-    source ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     luarocks install nn && \
     luarocks install nngraph && \
     luarocks install image && \
@@ -28,7 +36,7 @@ RUN cd /opt/neural-networks/torch && \
 
 # Install HDF5 tools
 RUN cd /opt/neural-networks && \
-    source ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     git clone https://github.com/deepmind/torch-hdf5.git && \
     cd torch-hdf5 && \
     luarocks make hdf5-0-0.rockspec LIBHDF5_LIBDIR="/usr/lib/arm-linux-gnueabihf/"
@@ -40,7 +48,7 @@ RUN pip install --upgrade cython && \
 
 # Install cjson
 RUN cd /opt/neural-networks/ && \
-    source ~/.bashrc && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
     wget -c http://www.kyne.com.au/%7Emark/software/download/lua-cjson-2.1.0.tar.gz && \
     tar xfz lua-cjson-2.1.0.tar.gz && \
     cd lua-cjson-2.1.0 && \
@@ -48,7 +56,7 @@ RUN cd /opt/neural-networks/ && \
 
 # Downloading NeuralTalk
 RUN cd /opt/neural-networks/ && \
-    git clone https://github.com/karpathy/neuraltalk2
+    git clone https://github.com/SaMnCo/neuraltalk2
 
 # Adding folders a local stuff 
 RUN mkdir -p /data/model /data/images 
@@ -69,5 +77,8 @@ RUN chmod +x /opt/neural-networks/install.sh && \
 
 RUN chmod +x /opt/neural-networks/install.sh && \
     chown root:root /opt/neural-networks/install.sh 
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD [ "/opt/neural-networks/install.sh", "/data/model", "/data/images" ]
