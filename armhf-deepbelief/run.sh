@@ -48,7 +48,7 @@ fi
 # Creating a mini version of the image for display
 convert "${IMAGE}" -resize 256x256 "${WEB_DIR}"/imgs/img_${NEXT}.jpg
 # cp "${IMAGE}" "${OUT_DIR}/"
-rm "${IMAGE}"
+# rm "${IMAGE}"
 
 # Adding image to the visualization file
 cat "${WEB_DIR}/${JSON_FILE}" | jq ". + [ {\"caption\": \"${RESULT}\", \"image_id\": \"${NEXT}\", \"source_image\": \"${IMAGE}\", \"list_proba\": ${JSON_RESULT} }]" > /tmp/tmp.file && \

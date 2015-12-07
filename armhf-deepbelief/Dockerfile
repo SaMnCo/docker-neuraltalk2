@@ -20,7 +20,7 @@ ENV NETWORK ccv2012.ntwk
 
 RUN apt-get update && \
     apt-get upgrade -yqq && \
-    apt-get install -yqq nano curl git wget mercurial gcc-4.8 g++-4.8 jq && \
+    apt-get install -yqq nano curl git wget mercurial gcc-4.8 g++-4.8 jq build-essential imagemagick && \
     mkdir -p /opt/deep-belief
 
 # Install deep-belief
@@ -46,13 +46,13 @@ VOLUME /data/images
 # Expose default port
 expose 8000
 
-ADD run.sh run.sh
-ADD web.sh web.sh
-ADD www /data/
+ADD run.sh /usr/bin/run.sh
+ADD web.sh /usr/bin/web.sh
+ADD www/* /data/www/
 
-RUN chmod +x run.sh && \
-    chown root:root run.sh && \
-    chmod +x web.sh && \
-    chown root:root web.sh
+RUN chmod +x /usr/bin/run.sh && \
+    chown root:root /usr/bin/run.sh && \
+    chmod +x /usr/bin/web.sh && \
+    chown root:root /usr/bin/web.sh
 
 CMD [ "web.sh" ]
