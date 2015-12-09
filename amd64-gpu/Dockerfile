@@ -7,7 +7,7 @@ ENV DATASET_SRC "http://cs.stanford.edu/people/karpathy/neuraltalk2/checkpoint_v
 
 RUN apt-get update && \ 
     apt-get upgrade -yqq && \
-    apt-get install -yqq nano curl git wget libprotobuf-dev protobuf-compiler libhdf5-serial-dev hdf5-tools python-pip build-essential python-dev linux-image-extra-virtual && \
+    apt-get install -yqq nano curl git wget libprotobuf-dev protobuf-compiler libhdf5-serial-dev hdf5-tools python-pip build-essential python-dev linux-image-extra-virtual software-properties-common && \
     mkdir -p /opt/neural-networks
 
 # Install torch
@@ -22,12 +22,14 @@ RUN cd /opt/neural-networks && \
 # Install CUDA
 RUN wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
     dpkg -i cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
+    rm -f cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
     apt-get update && \
-    apt-get install -yqq cuda && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq cuda && \
     export PATH=/usr/local/cuda-7.5/bin/:$PATH && \
     export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH
-    echo PATH=\"/usr/local/cuda-7.5/bin:$PATH\" >/etc/environment && \
-    echo "LD_LIBRARY_PATH=\"/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH\"" >> /etc/environment
+    echo 'export PATH=/usr/local/cuda-7.5/bin:$PATH' >> /root/.bashrc && \ 
+    echo '/usr/local/cuda-7.5/lib64' > /etc/ld.so.conf.d/cuda-7.5.conf && \ 
+    ldconfig 
 
 # Install additional dependencies
 RUN cd /opt/neural-networks/torch && \
