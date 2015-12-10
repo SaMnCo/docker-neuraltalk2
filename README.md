@@ -8,8 +8,8 @@ There are 4 folders for 3 distinct versions.
 
 * amd64 is a CPU only image analysis, to run on your laptop or a non-nVidia enabled computer. This one is also automatically pushed to the Docker Hub. 
 * amd64-gpu is built using the nvidia images. For some reasons, nVidia doesn't publish an image with cuDNN v3 so I can't have it published automagically, but provide instructions at the end of this document
-* amrhf: is my big failure so far, but I wanted to run this on a tiny raspberry pi 2. Unfortunately and despite great support from the team writing the original work, it seems this code doesn't like 32b processors like ARMv7, at least for now. 
-* arùhf-deepbelief: which leads me to this last folder, with a working but less powerful solution, based on [Deep Belief work](https://github.com/jetpacapp/DeepBeliefSDK)
+* armhf: is my big failure so far, but I wanted to run this on a tiny raspberry pi 2. Unfortunately and despite great support from the team writing the original work, it seems this code doesn't like 32b processors like ARMv7, at least for now. 
+* armhf-deepbelief: which leads me to this last folder, with a working but less powerful solution, based on [Deep Belief work](https://github.com/jetpacapp/DeepBeliefSDK)
 
 Note that the 2 ARM images cannot be built on the Docker Hub, but you can build it at home on your own ARM machine, or use an ARM public cloud. I am doing my best to publish the images to the registry as well. 
 
