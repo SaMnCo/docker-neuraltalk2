@@ -1,5 +1,5 @@
 # This version is meant to run on a GPU enabled machine, such as G2 instances on Amazon. 
-FROM ubuntu:trusty
+FROM nvidia/cuda:cudnn-devel
 
 MAINTAINER Samuel Cozannet <samuel.cozannet@madeden.com>
 
@@ -7,7 +7,7 @@ ENV DATASET_SRC "http://cs.stanford.edu/people/karpathy/neuraltalk2/checkpoint_v
 
 RUN apt-get update && \ 
     apt-get upgrade -yqq && \
-    apt-get install -yqq nano curl git wget libprotobuf-dev protobuf-compiler libhdf5-serial-dev hdf5-tools python-pip build-essential python-dev linux-image-extra-virtual software-properties-common && \
+    apt-get install -yqq nano curl git wget libprotobuf-dev protobuf-compiler libhdf5-serial-dev hdf5-tools python-pip build-essential python-dev && \
     mkdir -p /opt/neural-networks
 
 # Install torch
@@ -19,18 +19,6 @@ RUN cd /opt/neural-networks && \
     cd /opt/neural-networks/torch && \
     ./install.sh -b 
 
-# Install CUDA
-RUN wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
-    dpkg -i cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
-    rm -f cuda-repo-ubuntu1404_7.5-18_amd64.deb && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yqq cuda && \
-    export PATH=/usr/local/cuda-7.5/bin/:$PATH && \
-    export LD_LIBRARY_PATH=/usr/local/cuda-7.5/lib64:$LD_LIBRARY_PATH
-    echo 'export PATH=/usr/local/cuda-7.5/bin:$PATH' >> /root/.bashrc && \ 
-    echo '/usr/local/cuda-7.5/lib64' > /etc/ld.so.conf.d/cuda-7.5.conf && \ 
-    ldconfig 
-
 # Install additional dependencies
 RUN cd /opt/neural-networks/torch && \
     . /opt/neural-networks/torch/install/bin/torch-activate && \
@@ -40,6 +28,13 @@ RUN cd /opt/neural-networks/torch && \
     luarocks install nngraph && \
     luarocks install image && \
     luarocks install loadcaffe
+
+# Install CUDNN
+RUN cd /opt/neural-networks/torch && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
+    git clone https://github.com/soumith/cudnn.torch.git cudnn && \
+    cd cudnn && \
+    luarocks make cudnn-scm-1.rockspec
 
 # Install HDF5 tools
 RUN cd /opt/neural-networks && \
@@ -60,13 +55,6 @@ RUN cd /opt/neural-networks/ && \
     tar xfz lua-cjson-2.1.0.tar.gz && \
     cd lua-cjson-2.1.0 && \
     luarocks make
-
-# Install CUDNN
-#ADD libcudnn.so.* /opt/neural-networks/torch/install/lib/
-#RUN cd /opt/neural-networks/torch && \
-#    . /opt/neural-networks/torch/install/bin/torch-activate && \
-#    git clone https://github.com/soumith/cudnn.torch.git cudnn && \
-#    luarocks make cudnn-scm-1.rockspec 
 
 # Downloading NeuralTalk
 RUN cd /opt/neural-networks/ && \
