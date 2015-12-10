@@ -33,15 +33,15 @@ You can then connect on http://localhost:8000/vis to access visualization.
 
 You can do the most simple docker run ever: 
 
-    docker run -it -b samnco/neuraltalk2:latest
+    docker run -it -d samnco/neuraltalk2:latest
 
 Or you can specify a volume with images: 
 
-    docker run -it -b -v /path/to/images:/data/images -p 8000:8000 samnco/neuraltalk2:latest
+    docker run -it -d -v /path/to/images:/data/images -p 8000:8000 samnco/neuraltalk2:latest
 
 Finally, you can provide a pre-trained model, provided you share it in a volume mounted at /data/model. The model has to be a .t7 file to be recognized (simple check on extension)
 
-    docker run -it -b -v /path/to/images:/data/images -v /path/to/model:/data/model samnco/neuraltalk2:latest
+    docker run -it -d -v /path/to/images:/data/images -v /path/to/model:/data/model samnco/neuraltalk2:latest
 
 Then connect on the website
 
