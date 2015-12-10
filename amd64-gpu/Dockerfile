@@ -1,5 +1,5 @@
 # This version is meant to run on a GPU enabled machine, such as G2 instances on Amazon. 
-FROM nvidia/cuda:cudnn-devel
+FROM nvidia/cuda:cudnn3-devel
 
 MAINTAINER Samuel Cozannet <samuel.cozannet@madeden.com>
 

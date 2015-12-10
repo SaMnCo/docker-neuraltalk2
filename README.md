@@ -2,17 +2,22 @@
 
 The idea of these containers comes from some issues from the [original work repo](https://github.com/karpathy/neuraltalk2). 
 
-I thought I would create a simple Dockerfile to make it easy for people to start playing with the Neural Talk, which is a very very cool tech. These are the 2 main folder amd64 and armhf. 
+I thought I would create a simple Dockerfile to make it easy for people to start playing with the Neural Talk, which is a very very cool tech with tons of applications. 
 
-There are 2 folders here, as my intention is primarily to make this work on a raspberry pi 2, even if there is still some work to be done. The armhf branch cannot be processed on Docker Hub, but you can build it at home on your own ARM machine, or use an ARM public cloud. The image also has been uploaded to the hub. 
+There are 4 folders for 3 distinct versions. 
 
-Then as I struggled with Torch on Raspberry Pi 2, I searched for more solutions to recognize images, and I found some [Deep Belief work](https://github.com/jetpacapp/DeepBeliefSDK) that works nicely on Raspberry Pi and decided to add it as a container in the armhf-deepbelief folder.  
+* amd64 is a CPU only image analysis, to run on your laptop or a non-nVidia enabled computer. This one is also automatically pushed to the Docker Hub. 
+* amd64-gpu is built using the nvidia images. For some reasons, nVidia doesn't publish an image with cuDNN v3 so I can't have it published automagically, but provide instructions at the end of this document
+* amrhf: is my big failure so far, but I wanted to run this on a tiny raspberry pi 2. Unfortunately and despite great support from the team writing the original work, it seems this code doesn't like 32b processors like ARMv7, at least for now. 
+* arùhf-deepbelief: which leads me to this last folder, with a working but less powerful solution, based on [Deep Belief work](https://github.com/jetpacapp/DeepBeliefSDK)
 
-The intention of the containers is only to use a pre-trained model. I may change this in the future or if people request it. 
+Note that the 2 ARM images cannot be built on the Docker Hub, but you can build it at home on your own ARM machine, or use an ARM public cloud. I am doing my best to publish the images to the registry as well. 
+
+The intention of the containers is only to use a pre-trained model. I may change this in the future or if people request it (or for nerdy fun at some point :)
 
 # Neural Talk Containers
 
-* Stored in folders amd64 and armhf
+* Stored in folders amd64, amd64-gpu and armhf
 
 ## What this container does
 
@@ -49,6 +54,96 @@ Once you have more images added to your image folder, if you want to run the cap
 	docker exec -it <containerid> run.sh
 
 Other implementations offer an upload REST API, which is neat. I may introduce similar features in the future. 
+
+## Building & running the GPU image
+### Building
+
+nVidia publishes a set of Docker images for Cuda. For a reason I don't understand, and while the Dockerfile is available in their [repo](https://github.com/NVIDIA/nvidia-docker)... So anyway, you'll have to build it yourself. Here is how. 
+
+First you'll need to clone their repo: 
+
+	cd ~
+	git clone https://github.com/NVIDIA/nvidia-docker.git
+
+Now build the image for the cuDNN v3. 
+
+	cd ~/nvidia-docker/ubuntu-14.04/cuda/7.5/devel/cudnn3
+	sed -i s,cuda,nvidia/cuda, Dockerfile # For some reason nVidia also believes you create all images locally. Weird. 
+	docker build -t nvidia/cuda:cudnn3-devel .
+
+OK so now you have a proper image ready for more! 
+
+Let's now clone this repo 
+
+	cd ~
+	git clone https://github.com/SaMnCo/docker-neuraltalk2.git
+
+And let's build the image. You don't need an nvidia board for this, but you will need one to run it. 
+
+	docker build -t samnco/neurotalk2-gpu:homemade docker-neuraltalk2/amd64-gpu
+
+This will take a (very long) while. 
+
+### Running
+
+I have add a few issues running this in the cloud, so I guess I should share how to install the nVidia stack on a GPU enabled cloud instance such as a g2.2xlarge, running Ubuntu 14.04. It assumes you are root (otherwise copy to file and exec with sudo)
+
+	#!/bin/bash
+	USERNAME=ubuntu
+	USERGROUP=ubuntu
+	ARCH=amd64
+	export NVIDIA_GPGKEY_SUM="bd841d59a27a406e513db7d405550894188a4c1cd96bf8aa4f82f1b39e0b5c1c"
+	export NVIDIA_GPGKEY_FPR="889bee522da690103c4b085ed88c3d385c37d3be"
+	export CUDA_VERSION="7.5"
+	export CUDA_PKG_VERSION="7-5=7.5-18"
+
+	apt-get update && apt-get upgrade -yqq
+
+	apt-get update && sudo apt-get install -yqq build-essential linux-image-extra-virtual
+
+	apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/GPGKEY && \
+	    apt-key adv --export --no-emit-version -a $NVIDIA_GPGKEY_FPR | tail -n +2 > cudasign.pub && \
+	    echo "$NVIDIA_GPGKEY_SUM cudasign.pub" | sha256sum -c --strict - && rm cudasign.pub && \
+	    echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64 /" > /etc/apt/sources.list.d/cuda.list
+
+	apt-get update && apt-get install -y --no-install-recommends --force-yes \
+	    cuda-nvrtc-$CUDA_PKG_VERSION \
+	    cuda-cusolver-$CUDA_PKG_VERSION \
+	    cuda-cublas-$CUDA_PKG_VERSION \
+	    cuda-cufft-$CUDA_PKG_VERSION \
+	    cuda-curand-$CUDA_PKG_VERSION \
+	    cuda-cusparse-$CUDA_PKG_VERSION \
+	    cuda-npp-$CUDA_PKG_VERSION \
+	    cuda-cudart-$CUDA_PKG_VERSION \
+	    cuda && \
+	    ln -s cuda-$CUDA_VERSION /usr/local/cuda
+
+	echo "/usr/local/cuda/lib" >> /etc/ld.so.conf.d/cuda.conf && \
+	    echo "/usr/local/cuda/lib64" >> /etc/ld.so.conf.d/cuda.conf && \
+	    ldconfig
+
+	echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf && \
+	    echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf && \
+	    ldconfig
+
+	export PATH="/usr/local/cuda/bin:${PATH}"
+	export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}"
+
+OK so after this, we have an instance that should work. I strongly advise you reboot it now. 
+
+Now you'll need to also have the nvidia-docker repo here so 
+
+	cd /home/ubuntu
+	git clone https://github.com/NVIDIA/nvidia-docker.git
+
+and now, to run your new image,
+
+	GPU=0 /home/ubuntu/nvidia-docker/nvidia-docker run -it -v /path/to/images:/data/images -v /path/to/model:/data/model --name neurotalk2-gpu samnco/neuraltalk2-gpu:latest
+
+If you do not provide images or a model, the container will download at first run. 
+
+Further runs use the same run.sh script as above. 
+
 
 # Deep Belief Container
 

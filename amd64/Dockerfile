@@ -3,7 +3,6 @@ FROM ubuntu:trusty
 MAINTAINER Samuel Cozannet <samuel.cozannet@madeden.com>
 
 ENV DATASET_SRC "http://cs.stanford.edu/people/karpathy/neuraltalk2/checkpoint_v1_cpu.zip"
-ENV 
 
 RUN apt-get update && \ 
     apt-get upgrade -yqq && \
@@ -17,8 +16,7 @@ RUN cd /opt/neural-networks && \
     ./install-deps && \
     git clone https://github.com/torch/distro.git /opt/neural-networks/torch --recursive && \
     cd /opt/neural-networks/torch && \
-    ./install.sh -b && \
-     ~/.bashrc
+    ./install.sh -b 
 
 # Install additional dependencies
 RUN cd /opt/neural-networks/torch && \
