@@ -4,7 +4,7 @@ The idea of these containers comes from some issues from the [original work repo
 
 I thought I would create a simple Dockerfile to make it easy for people to start playing with the Neural Talk, which is a very very cool tech with tons of applications. 
 
-There are 4 folders for 3 distinct versions. 
+There are 4 folders: 
 
 * amd64 is a CPU only image analysis, to run on your laptop or a non-nVidia enabled computer. This one is also automatically pushed to the Docker Hub. 
 * amd64-gpu is built using the nvidia images. For some reasons, nVidia doesn't publish an image with cuDNN v3 so I can't have it published automagically, but provide instructions at the end of this document
@@ -138,12 +138,15 @@ Now you'll need to also have the nvidia-docker repo here so
 
 and now, to run your new image,
 
-	GPU=0 /home/ubuntu/nvidia-docker/nvidia-docker run -it -v /path/to/images:/data/images -v /path/to/model:/data/model --name neurotalk2-gpu samnco/neuraltalk2-gpu:latest
+	GPU=0 /home/ubuntu/nvidia-docker/nvidia-docker run -it -v /path/to/images:/data/images -v /path/to/model:/data/model -p 8000:8000 --name neurotalk2-gpu samnco/neuraltalk2-gpu:latest
 
 If you do not provide images or a model, the container will download at first run. 
 
 Further runs use the same run.sh script as above. 
 
+## Post run
+
+By default the container exposes port 8000. You'll need to consider opening this on TCP in the cloud configuration panel. 
 
 # Deep Belief Container
 
