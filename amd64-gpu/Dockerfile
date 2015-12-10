@@ -29,6 +29,13 @@ RUN cd /opt/neural-networks/torch && \
     luarocks install image && \
     luarocks install loadcaffe
 
+# Install addons to Torch
+RUN cd /opt/neural-networks && \
+    . /opt/neural-networks/torch/install/bin/torch-activate && \
+    git clone https://github.com/mvitez/torch7.git mvittorch7 && \
+    cd mvittorch7 && \
+    luarocks make rocks/torch-scm-1.rockspec
+
 # Install CUDNN
 RUN cd /opt/neural-networks/torch && \
     . /opt/neural-networks/torch/install/bin/torch-activate && \
