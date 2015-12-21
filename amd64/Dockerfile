@@ -46,16 +46,9 @@ RUN cd /opt/neural-networks/ && \
     cd lua-cjson-2.1.0 && \
     luarocks make
 
-# Install addons to Torch
-RUN cd /opt/neural-networks && \
-    . /opt/neural-networks/torch/install/bin/torch-activate && \
-    git clone https://github.com/mvitez/torch7.git mvittorch7 && \
-    cd mvittorch7 && \
-    luarocks make rocks/torch-scm-1.rockspec
-
 # Downloading NeuralTalk
 RUN cd /opt/neural-networks/ && \
-    git clone https://github.com/SaMnCo/neuraltalk2
+    git clone https://github.com/karpathy/neuraltalk2
 
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
