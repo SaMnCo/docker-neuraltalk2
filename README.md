@@ -4,20 +4,22 @@ The idea of these containers comes from some issues from the [original work repo
 
 I thought I would create a simple Dockerfile to make it easy for people to start playing with the Neural Talk, which is a very very cool tech with tons of applications. 
 
-There are 4 folders: 
+There are 2 folders: 
+
+* Neuraltalk contains containers for the Neural Talk 2 networks
+* DeepBelief is an implementation of the [JetPac Deep Belief SDK](https://github.com/jetpacapp/DeepBeliefSDK)
+
+Then in each folders, various Dockerfiles are present, sorted by extensions: 
 
 * amd64 is a CPU only image analysis, to run on your laptop or a non-nVidia enabled computer. This one is also automatically pushed to the Docker Hub. 
 * amd64-gpu is built using the nvidia images. For some reasons, nVidia doesn't publish an image with cuDNN v3 so I can't have it published automagically, but provide instructions at the end of this document
-* armhf: is my big failure so far, but I wanted to run this on a tiny raspberry pi 2. Unfortunately and despite great support from the team writing the original work, it seems this code doesn't like 32b processors like ARMv7, at least for now. 
-* armhf-deepbelief: which leads me to this last folder, with a working but less powerful solution, based on [Deep Belief work](https://github.com/jetpacapp/DeepBeliefSDK)
+* armhf: Supposedly compiled and working on 32b ARMv7 processors (powering Raspberry Pi 2 for example). Unfortunately, for now, and despite great support from the team writing the original work, it seems the neuraltalk2 doesn't like 32b processors like ARMv7, at least for now. Deepbelief however is OK. 
 
-Note that the 2 ARM images cannot be built on the Docker Hub, but you can build it at home on your own ARM machine, or use an ARM public cloud. I am doing my best to publish the images to the registry as well. 
+Note that the ARM images cannot be built on the Docker Hub, but you can build it at home on your own ARM machine, or use an ARM public cloud. I am doing my best to publish the images to the registry as well. 
 
 The intention of the containers is only to use a pre-trained model. I may change this in the future or if people request it (or for nerdy fun at some point :)
 
 # Neural Talk Containers
-
-* Stored in folders amd64, amd64-gpu and armhf
 
 ## What this container does
 
@@ -150,11 +152,8 @@ By default the container exposes port 8000. You'll need to consider opening this
 
 # Deep Belief Container
 
-* Stored in armhf-deepbelief and on the hub samnco/armhf-deepbelief:latest
-
 ## What this container does
 
-This images is meant to run on a ARMv7 device such as a Raspberry Pi
 It provides a deep belief network to analyze the content of images. It is an implementation  of the work shared by https://github.com/jetpacapp
 
 When started, it will expose a web server on port 8000 that shares visualization of the images and their caption. Adding images is done by running the "run.sh" script with a path to an image.
